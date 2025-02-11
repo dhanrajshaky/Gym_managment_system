@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -23,22 +26,34 @@ public class MemberController {
 
     @PostMapping("/add")
     public Member addMember(@Valid  @RequestBody Member member){
-
-        //add logic for default role
-        if (member.getRole()==null){
-            member.setRole("USER");
-        }
         return memberService.addMember(member);
     }
 
     @GetMapping("/all")
-    public Page<Member> getAllMember(
+    public ResponseEntity<Map<String, Object>> getAllMembers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return memberService.getAllMember(pageable);
+        Page<Member> membersPage = memberService.getAllMember(pageable);
+
+        // Convert Page<Member> to List<MemberDTO>
+        List<Member> memberDTOList = membersPage.stream()
+                .map(member -> new Member(
+                        member.getId(),
+                        member.getName(),
+                        member.getEmail(),
+                        member.getMembershipPlan()))
+                .collect(Collectors.toList());
+
+        // Creating a map to send both list of members and totalPages for pagination
+        Map<String, Object> response = new HashMap<>();
+        response.put("members", memberDTOList);
+        response.put("totalPages", membersPage.getTotalPages());
+
+        return ResponseEntity.ok(response);
     }
+
 
 
     @PutMapping("/update-{id}")

@@ -13,15 +13,16 @@ import jakarta.validation.constraints.Size;
 public class Member {
 
 
-    public Member(Long id,String name, String email, String membershipPlan, String role) {
-        this.id=id ;
+    public Member(Long id, String name, String email, String membershipPlan) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.membershipPlan = membershipPlan;
-        this.role = role;
     }
 
-    // entity of database column
+    public Member() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -38,17 +39,6 @@ public class Member {
     @NotBlank(message = "Membership plain is required")
     private String membershipPlan;
 
-    private String role;
-
-    //Getter and Setter
-
-    public String getRole(){
-        return role;
-    }
-
-    public void setRole(String Role){
-        this.role=Role;
-    }
 
     public Long getId() {
         return id;
